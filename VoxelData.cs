@@ -4,16 +4,28 @@ using UnityEngine;
 
 public static class VoxelData
 {
+
     public static readonly int ChunkWidth = 5;
     public static readonly int ChunkHeight = 15;
+    public static readonly int WorldSizeInChunks = 50;
+    public static readonly int ViewDistanceInChunks = 8;
+    public static int WorldSizeInBlocks
+    {
+
+        get { return WorldSizeInChunks * ChunkWidth; }
+
+    }
 
     public static readonly int TextureAtlasSizeInBlocks = 4;
     public static float NormalizedBlockTextureSize
     {
+
         get { return 1f / (float)TextureAtlasSizeInBlocks; }
+
     }
 
-    public static readonly Vector3[] voxelVerts = new Vector3[8] {
+    public static readonly Vector3[] voxelVerts = new Vector3[8]
+    {
 
         new Vector3(0.0f, 0.0f, 0.0f),
         new Vector3(1.0f, 0.0f, 0.0f),
@@ -26,7 +38,8 @@ public static class VoxelData
 
     };
 
-    public static readonly Vector3[] faceChecks = new Vector3[6] {
+    public static readonly Vector3[] faceChecks = new Vector3[6]
+    {
 
         new Vector3(0.0f, 0.0f, -1.0f),
         new Vector3(0.0f, 0.0f, 1.0f),
@@ -37,9 +50,10 @@ public static class VoxelData
 
     };
 
-    public static readonly int[,] voxelTris = new int[6, 4] {
+    public static readonly int[,] voxelTris = new int[6, 4]
+    {
 
-        //Back, Front, Top, Bottom, Left, Right
+        // Back, Front, Top, Bottom, Left, Right
 
 		// 0 1 2 2 1 3
 		{0, 3, 1, 2}, // Back Face
@@ -51,7 +65,8 @@ public static class VoxelData
 
 	};
 
-    public static readonly Vector2[] voxelUvs = new Vector2[4] {
+    public static readonly Vector2[] voxelUvs = new Vector2[4]
+    {
 
         new Vector2 (0.0f, 0.0f),
         new Vector2 (0.0f, 1.0f),
