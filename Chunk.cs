@@ -7,9 +7,9 @@ public class Chunk
 
     public ChunkCoord coord;
 
+    GameObject chunkObject;
     MeshRenderer meshRenderer;
     MeshFilter meshFilter;
-    GameObject chunkObject;
 
     int vertexIndex = 0;
     List<Vector3> vertices = new List<Vector3>();
@@ -24,17 +24,16 @@ public class Chunk
     {
 
         coord = _coord;
-        chunkObject = new GameObject();
-        chunkObject.transform.position = new Vector3(coord.x * VoxelData.ChunkWidth, 0f, coord.z * VoxelData.ChunkWidth);
-
-        meshRenderer = chunkObject.AddComponent<MeshRenderer>();
-        meshFilter = chunkObject.AddComponent<MeshFilter>();
         world = _world;
+        chunkObject = new GameObject();
+        meshFilter = chunkObject.AddComponent<MeshFilter>();
+        meshRenderer = chunkObject.AddComponent<MeshRenderer>();
 
-        chunkObject.transform.SetParent(world.transform);
         meshRenderer.material = world.material;
+        chunkObject.transform.SetParent(world.transform);
+        chunkObject.transform.position = new Vector3(coord.x * VoxelData.ChunkWidth, 0f, coord.z * VoxelData.ChunkWidth);
+        chunkObject.name = "Chunk " + coord.x + ", " + coord.z;
 
-        chunkObject.name = coord.x + ", " + coord.z;
 
         PopulateVoxelMap();
         CreateMeshData();
@@ -42,31 +41,7 @@ public class Chunk
 
     }
 
-    public bool isActive
-    {
-
-        get { return chunkObject.activeSelf; }
-        set { chunkObject.SetActive(value); }
-
-    }
-
-    Vector3 position
-    {
-
-        get { return chunkObject.transform.position; }
-
-    }
-
-    bool IsVoxelInChunk(int x, int y, int z)
-    {
-
-        if (x < 0 || x > VoxelData.ChunkWidth - 1 || y < 0 || y > VoxelData.ChunkHeight - 1 || z < 0 || z > VoxelData.ChunkWidth - 1)
-            return false;
-        else return true;
-
-    }
-
-    public void PopulateVoxelMap()
+    void PopulateVoxelMap()
     {
 
         for (int y = 0; y < VoxelData.ChunkHeight; y++)
@@ -84,7 +59,7 @@ public class Chunk
 
     }
 
-    public void CreateMeshData()
+    void CreateMeshData()
     {
 
         for (int y = 0; y < VoxelData.ChunkHeight; y++)
@@ -94,7 +69,8 @@ public class Chunk
                 for (int z = 0; z < VoxelData.ChunkWidth; z++)
                 {
 
-                    AddVoxelDataToChunk(new Vector3(x, y, z));
+                    if (world.blocktypes[voxelMap[x, y, z]].isSolid)
+                        AddVoxelDataToChunk(new Vector3(x, y, z));
 
                 }
             }
@@ -102,12 +78,28 @@ public class Chunk
 
     }
 
-    public byte GetVoxelFromMap(Vector3 pos)
+    public bool isActive
     {
 
-        pos -= position;
+        get { return chunkObject.activeSelf; }
+        set { chunkObject.SetActive(value); }
 
-        return voxelMap[(int)pos.x, (int)pos.y, (int)pos.z];
+    }
+
+    public Vector3 position
+    {
+
+        get { return chunkObject.transform.position; }
+
+    }
+
+    bool IsVoxelInChunk(int x, int y, int z)
+    {
+
+        if (x < 0 || x > VoxelData.ChunkWidth - 1 || y < 0 || y > VoxelData.ChunkHeight - 1 || z < 0 || z > VoxelData.ChunkWidth - 1)
+            return false;
+        else
+            return true;
 
     }
 
@@ -118,7 +110,6 @@ public class Chunk
         int y = Mathf.FloorToInt(pos.y);
         int z = Mathf.FloorToInt(pos.z);
 
-        // If position is outside of this chunk...
         if (!IsVoxelInChunk(x, y, z))
             return world.blocktypes[world.GetVoxel(pos + position)].isSolid;
 
@@ -157,7 +148,7 @@ public class Chunk
 
     }
 
-    public void CreateMesh()
+    void CreateMesh()
     {
 
         Mesh mesh = new Mesh();
@@ -187,6 +178,34 @@ public class Chunk
         uvs.Add(new Vector2(x + VoxelData.NormalizedBlockTextureSize, y));
         uvs.Add(new Vector2(x + VoxelData.NormalizedBlockTextureSize, y + VoxelData.NormalizedBlockTextureSize));
 
+
+    }
+
+}
+
+public class ChunkCoord
+{
+
+    public int x;
+    public int z;
+
+    public ChunkCoord(int _x, int _z)
+    {
+
+        x = _x;
+        z = _z;
+
+    }
+
+    public bool Equals(ChunkCoord other)
+    {
+
+        if (other == null)
+            return false;
+        else if (other.x == x && other.z == z)
+            return true;
+        else
+            return false;
 
     }
 
